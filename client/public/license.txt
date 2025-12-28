@@ -1,0 +1,11 @@
+Model Information:
+* title:	Talking Tom Adult
+* source:	https://sketchfab.com/3d-models/talking-tom-adult-c247a92a2c7b44438b4f900195624b6b
+* author:	Guilherme Navarro (https://sketchfab.com/guinavarro.al)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Talking Tom Adult" (https://sketchfab.com/3d-models/talking-tom-adult-c247a92a2c7b44438b4f900195624b6b) by Guilherme Navarro (https://sketchfab.com/guinavarro.al) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

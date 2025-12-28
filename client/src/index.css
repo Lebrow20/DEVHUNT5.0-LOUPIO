@@ -1,0 +1,80 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Savate:ital,wght@0,200..900;1,200..900&display=swap'); */
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Raleway';
+  src: url('assets/fonts/Raleway-VariableFont_wght.ttf');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Meow';
+  src: url('assets/fonts/MeowScript-Regular.ttf');
+  font-weight: 700;
+  font-style: normal;
+}
+
+:root {
+  font-family: "Raleway", sans-serif;
+  color-scheme: light;
+}
+
+.meow {
+  font-family: 'Meow';
+}
+
+button {
+  cursor: pointer;
+}
+
+@layer utilities {
+  @keyframes floating {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-floating {
+    animation: floating 3s ease-in-out infinite;
+  }
+}
+
+@keyframes gradient {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
+}
+
+.animate-floating {
+  animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
