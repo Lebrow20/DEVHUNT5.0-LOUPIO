@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
 import Service from '../components/Service'
 import Footer from './Footer'
-import ChatBot from '../components/ChatBot'
+import ChatBot from '../components/Chatbot'
 import Loader from '../components/Loader' 
 
 const Accueil = () => {
