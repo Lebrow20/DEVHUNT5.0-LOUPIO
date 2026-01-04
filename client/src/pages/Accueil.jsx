@@ -3,8 +3,8 @@ import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
 import Service from '../components/Service'
 import Footer from './Footer'
-import ChatBot from '../components/Chatbot'
-import Loader from '../components/Loader' 
+import ChatBot from '../components/Chatbot.jsx'
+import Loader from '../components/Loader'
 
 const Accueil = () => {
   const [isLoading, setIsLoading] = useState(true)
@@ -12,7 +12,7 @@ const Accueil = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false)
-    }, 2500) 
+    }, 2500)
     return () => clearTimeout(timer)
   }, [])
 
