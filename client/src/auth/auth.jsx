@@ -22,10 +22,11 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordView = () => setShowPassword(!showPassword);
 
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:3002/user/login", { // adapte le port si besoin
+      const response = await fetch(`${API_URL}/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -58,7 +59,7 @@ const Auth = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await fetch("http://localhost:3002/user/ajouter", {
+      const response = await fetch(`${API_URL}/user/ajouter`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pseudo, email, password }),
