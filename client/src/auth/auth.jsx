@@ -83,7 +83,7 @@ const Auth = () => {
 
   return (
   <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-yellow-400 via-white to-blue-400">
-  <div className="w-full max-w-md p-6 bg-white rounded-2xl shadow-2xl flex flex-col items-center gap-5 transition-all duration-500 animate-fade-in-up relative w-full">
+  <div className="w-full max-w-md p-6 bg-white rounded-2xl shadow-2xl flex flex-col items-center gap-5 transition-all duration-500 animate-fade-in-up relative">
 
     {/* Icône retour en haut à gauche */}
     <Link to="/" className="absolute top-4 left-4 text-blue-600 hover:text-blue-800 transition-colors">
