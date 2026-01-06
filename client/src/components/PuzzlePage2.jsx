@@ -7,12 +7,14 @@ const PuzzlePage2 = () => {
   const [puzzleSize, setPuzzleSize] = useState(3);
   const [pieces, setPieces] = useState([]);
   const [draggedPiece, setDraggedPiece] = useState(null);
+  const [selectedPiece, setSelectedPiece] = useState(null);
   const [isComplete, setIsComplete] = useState(false);
   const [moves, setMoves] = useState(0);
   const [timer, setTimer] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState('animals');
   const [showHint, setShowHint] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const timerRef = useRef(null);
 
   const themes = {
@@ -29,7 +31,6 @@ const PuzzlePage2 = () => {
       colors: ['🚀', '🌙', '⭐', '☄️', '🪐', '🌍', '☀️', '🌕', '🌌']
     }
   };
-
   const initializePuzzle = () => {
     const totalPieces = puzzleSize * puzzleSize;
     const themeEmojis = themes[selectedTheme].colors;
@@ -59,7 +60,20 @@ const PuzzlePage2 = () => {
     setTimer(0);
     setIsPlaying(true);
     setShowHint(false);
+    setSelectedPiece(null);
   };
+
+  // Détecter si on est sur mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (isPlaying && !isComplete) {
@@ -92,36 +106,57 @@ const PuzzlePage2 = () => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
   };
-
   const handleDrop = (e, targetPosition) => {
     e.preventDefault();
     if (!draggedPiece) return;
 
     const targetPiece = pieces.find(p => p.currentPosition === targetPosition);
     if (targetPiece && targetPiece.id !== draggedPiece.id) {
-      const newPieces = pieces.map(piece => {
-        if (piece.id === draggedPiece.id) {
-          return {
-            ...piece,
-            currentPosition: targetPosition,
-            isCorrect: targetPosition === piece.correctPosition
-          };
-        }
-        if (piece.id === targetPiece.id) {
-          return {
-            ...piece,
-            currentPosition: draggedPiece.currentPosition,
-            isCorrect: draggedPiece.currentPosition === piece.correctPosition
-          };
-        }
-        return piece;
-      });
-
-      setPieces(newPieces);
-      setMoves(prev => prev + 1);
+      swapPieces(draggedPiece, targetPiece);
     }
 
     setDraggedPiece(null);
+  };
+
+  // Fonction pour échanger deux pièces
+  const swapPieces = (piece1, piece2) => {
+    const newPieces = pieces.map(piece => {
+      if (piece.id === piece1.id) {
+        return {
+          ...piece,
+          currentPosition: piece2.currentPosition,
+          isCorrect: piece2.currentPosition === piece.correctPosition
+        };
+      }
+      if (piece.id === piece2.id) {
+        return {
+          ...piece,
+          currentPosition: piece1.currentPosition,
+          isCorrect: piece1.currentPosition === piece.correctPosition
+        };
+      }
+      return piece;
+    });
+
+    setPieces(newPieces);
+    setMoves(prev => prev + 1);
+  };
+
+  // Gérer les clics sur les pièces (mode mobile)
+  const handlePieceClick = (piece) => {
+    if (!isMobile) return; // Ne fonctionne qu'en mode mobile
+
+    if (!selectedPiece) {
+      // Première pièce sélectionnée
+      setSelectedPiece(piece);
+    } else if (selectedPiece.id === piece.id) {
+      // Déselectionner si on clique sur la même pièce
+      setSelectedPiece(null);
+    } else {
+      // Échanger les deux pièces
+      swapPieces(selectedPiece, piece);
+      setSelectedPiece(null);
+    }
   };
 
   const formatTime = (seconds) => {
@@ -186,24 +221,54 @@ const PuzzlePage2 = () => {
           <div className="text-center text-xl font-bold text-gray-700 animate-pulse mb-6 bg-gray-100 rounded-full py-3 px-6 shadow-lg border border-gray-300">
             ✨ Bravo ! Continue comme ça ! 🎈
           </div>
-        )}        <div className="bg-white border-2 border-gray-200 rounded-3xl shadow-2xl p-6 mb-6 flex justify-center">
+        )}
+
+        {/* Instructions pour mobile */}
+        {isMobile && (
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-3xl p-4 mb-6 shadow-lg">
+            <div className="text-center">
+              <span className="text-blue-600 font-bold text-lg">
+                📱 Mode Tactile : Clique sur deux pièces pour les échanger !
+              </span>
+              {selectedPiece && (
+                <div className="mt-2 text-sm text-blue-500 animate-pulse">
+                  Pièce sélectionnée : {selectedPiece.emoji} - Clique sur une autre pièce pour échanger
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="bg-white border-2 border-gray-200 rounded-3xl shadow-2xl p-6 mb-6 flex justify-center">
           <div
             className="grid gap-2"
             style={{ gridTemplateColumns: `repeat(${puzzleSize}, 1fr)` }}
           >
             {Array.from({ length: puzzleSize * puzzleSize }).map((_, position) => {
               const piece = getPieceAtPosition(position);
+              const isSelected = selectedPiece && piece && selectedPiece.id === piece.id;
+
               return (
                 <div
                   key={position}
-                  className={`w-16 h-16 md:w-20 md:h-20 border-3 rounded-xl flex items-center justify-center text-2xl cursor-move transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 ${piece?.isCorrect ? 'border-green-400 bg-green-50' : 'border-gray-400 bg-gray-50'}`}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, position)}
+                  className={`w-16 h-16 md:w-20 md:h-20 border-3 rounded-xl flex items-center justify-center text-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 ${piece?.isCorrect
+                      ? 'border-green-400 bg-green-50'
+                      : 'border-gray-400 bg-gray-50'
+                    } ${isSelected
+                      ? 'border-blue-500 bg-blue-100 ring-4 ring-blue-300'
+                      : ''
+                    } ${isMobile
+                      ? 'cursor-pointer active:scale-95'
+                      : 'cursor-move'
+                    }`}
+                  onDragOver={!isMobile ? handleDragOver : undefined}
+                  onDrop={!isMobile ? (e) => handleDrop(e, position) : undefined}
+                  onClick={isMobile && piece ? () => handlePieceClick(piece) : undefined}
                 >
                   {piece && (
                     <div
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, piece)}
+                      draggable={!isMobile}
+                      onDragStart={!isMobile ? (e) => handleDragStart(e, piece) : undefined}
                       className="w-full h-full flex items-center justify-center select-none"
                     >
                       {piece.emoji}
@@ -257,27 +322,48 @@ const PuzzlePage2 = () => {
                 </button>
               </div>
             </div>
-          )}
-
-        <div className="bg-gray-50 border-2 border-gray-200 rounded-3xl p-6 mt-6 shadow-2xl">
+          )}        <div className="bg-gray-50 border-2 border-gray-200 rounded-3xl p-6 mt-6 shadow-2xl">
           <h3 className="font-bold text-gray-700 text-xl mb-4 text-center">👶 Comment jouer :</h3>
           <ul className="space-y-3 text-gray-700 font-semibold">
-            <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
-              <span className="text-2xl">🖱️</span>
-              Glisse les pièces avec ta souris ou ton doigt.
-            </li>
-            <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
-              <span className="text-2xl">💚</span>
-              Les pièces vertes sont bien placées !
-            </li>
-            <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
-              <span className="text-2xl">💡</span>
-              Tu peux regarder l'indice si tu es bloqué !
-            </li>
-            <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
-              <span className="text-2xl">🌟</span>
-              Essaye de finir avec le moins de coups possible !
-            </li>
+            {isMobile ? (
+              <>
+                <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
+                  <span className="text-2xl">👆</span>
+                  Clique sur une pièce pour la sélectionner.
+                </li>
+                <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
+                  <span className="text-2xl">🔄</span>
+                  Clique sur une autre pièce pour échanger leur place.
+                </li>
+                <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
+                  <span className="text-2xl">💚</span>
+                  Les pièces vertes sont bien placées !
+                </li>
+                <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
+                  <span className="text-2xl">💡</span>
+                  Tu peux regarder l'indice si tu es bloqué !
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
+                  <span className="text-2xl">🖱️</span>
+                  Glisse les pièces avec ta souris.
+                </li>
+                <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
+                  <span className="text-2xl">💚</span>
+                  Les pièces vertes sont bien placées !
+                </li>
+                <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
+                  <span className="text-2xl">💡</span>
+                  Tu peux regarder l'indice si tu es bloqué !
+                </li>
+                <li className="flex items-center gap-3 bg-white rounded-full py-2 px-4 border border-gray-200">
+                  <span className="text-2xl">🌟</span>
+                  Essaye de finir avec le moins de coups possible !
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>
